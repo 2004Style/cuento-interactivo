@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Dragón de las Letras ✨ Cuento Interactivo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Nunito:wght@600;800&display=swap');
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(170deg, #0c0c2e 0%, #1a1a4a 30%, #4a1a6b 60%, #ff6b9d 100%);
+    min-height: 100vh;
+    color: #fff;
+    overflow-x: hidden;
+  }
+  
+  .stars {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+  }
+  .star {
+    position: absolute; background: #fff; border-radius: 50%;
+    animation: twinkle 3s infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; } 50% { opacity: 0.95; }
+  }
+  
+  .container {
+    position: relative; z-index: 1;
+    max-width: 780px; margin: 0 auto; padding: 20px; text-align: center;
+  }
+  
+  h1 {
+    font-family: 'Comic Neue', cursive;
+    font-size: 2.3rem;
+    text-shadow: 0 0 25px #ffeaa7, 0 0 50px #fdcb6e;
+    margin: 15px 0 10px;
+  }
+  
+  .story-box {
+    background: rgba(0,0,0,0.35);
+    border-radius: 22px;
+    padding: 25px 22px;
+    margin: 20px 0;
+    border: 2px solid rgba(255,255,255,0.2);
+    min-height: 180px;
+    text-align: left;
+    line-height: 1.65;
+    font-size: 1.15rem;
+  }
+  
+  .story-box p { margin-bottom: 12px; }
+  
+  .emoji-scene {
+    font-size: 3.5rem;
+    text-align: center;
+    margin: 15px 0;
+    filter: drop-shadow(0 0 12px rgba(255,255,255,0.4));
+  }
+  
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 20px 0;
+  }
+  
+  .choice-btn {
+    background: linear-gradient(145deg, #a29bfe, #6c5ce7);
+    color: white;
+    border: none;
+    padding: 16px 20px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 16px;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+    transition: all 0.2s;
+    font-family: 'Nunito', sans-serif;
+    text-align: left;
+    border: 2px solid rgba(255,255,255,0.3);
+  }
+  .choice-btn:hover {
+    transform: translateX(8px) scale(1.02);
+    box-shadow: 0 8px 22px rgba(162,155,254,0.5);
+  }
+  
+  .btn {
+    background: linear-gradient(145deg, #fd79a8, #e84393);
+    color: white; border: none;
+    padding: 12px 26px; font-size: 1.05rem; font-weight: 800;
+    border-radius: 50px; cursor: pointer; margin: 6px;
+    box-shadow: 0 5px 14px rgba(0,0,0,0.3);
+    font-family: 'Nunito', sans-serif;
+  }
+  .btn-speak { background: linear-gradient(145deg, #74b9ff, #0984e3); }
+  
+  .phonics-challenge {
+    background: rgba(255,234,167,0.15);
+    border: 2px dashed #ffeaa7;
+    border-radius: 16px;
+    padding: 18px;
+    margin: 18px 0;
+  }
+  
+  .phonics-challenge input {
+    font-size: 1.4rem;
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: 3px solid #ffeaa7;
+    text-align: center;
+    width: 120px;
+    font-weight: 800;
+    margin: 10px;
+  }
+  
+  .feedback {
+    font-size: 1.3rem; font-weight: 800;
+    margin: 12px 0; min-height: 30px;
+  }
+  .ok { color: #55efc4; }
+  .bad { color: #ff7675; }
+  
+  footer {
+    margin-top: 30px; padding: 16px;
+    font-size: 0.8rem; opacity: 0.7;
+    border-top: 1px solid rgba(255,255,255,0.2);
+  }
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+
+<div class="container">
+  <h1>🐉 El Dragón de las Letras 🐉</h1>
+  <p style="opacity:0.9; margin-bottom:10px;">Un cuento interactivo para aprender jugando</p>
+  
+  <div class="emoji-scene" id="sceneEmoji">🏰</div>
+  
+  <div class="story-box" id="storyText">
+    <p>Había una vez un pequeño pueblo mágico donde las letras vivían felices… hasta que un dragón travieso se llevó todas las sílabas del bosque.</p>
+    <p>Tú eres el valiente héroe que debe recuperarlas. ¿Estás listo?</p>
+  </div>
+  
+  <div class="choices" id="choices"></div>
+  
+  <div id="challengeArea" style="display:none;"></div>
+  
+  <div class="feedback" id="feedback"></div>
+  
+  <div style="margin-top:15px;">
+    <button class="btn btn-speak" onclick="speakCurrent()">🔊 Escuchar</button>
+    <button class="btn" onclick="restart()" style="display:none;" id="restartBtn">🔄 Empezar de nuevo</button>
+  </div>
+  
+  <footer>
+    Contenido original educativo © 2026 · Creado por Grok<br>
+    Cuento y juegos didácticos libres de marcas comerciales. No afiliado a Disney ni a ninguna empresa.
+  </footer>
+</div>
+
+<script>
+const story = {
+  start: {
+    emoji: "🏰",
+    text: `<p>Había una vez un pequeño pueblo mágico donde las letras vivían felices… hasta que un dragón travieso se llevó todas las sílabas del bosque.</p>
+           <p>Tú eres el valiente héroe que debe recuperarlas. ¿Estás listo?</p>`,
+    speak: "Había una vez un pequeño pueblo mágico. Un dragón se llevó las sílabas. ¿Estás listo para recuperarlas?",
+    choices: [
+      { text: "¡Sí! ¡Vamos al bosque! 🌲", next: "bosque" },
+      { text: "Primero busco una varita mágica 🪄", next: "varita" }
+    ]
+  },
+  bosque: {
+    emoji: "🌲",
+    text: `<p>Llegas al bosque encantado. Las hojas susurran: “¡Ayuda… las sílabas se fueron!”</p>
+           <p>De pronto aparece una hadita. Te dice: “Para abrir el camino debes formar la palabra <strong>MAGIA</strong> con estas sílabas:”</p>`,
+    speak: "Llegas al bosque. Una hadita te pide formar la palabra magia.",
+    challenge: {
+      type: "syllables",
+      word: "MAGIA",
+      syllables: ["MA", "GIA"],
+      success: "camino"
+    }
+  },
+  varita: {
+    emoji: "🪄",
+    text: `<p>Encuentras una varita brillante bajo una estrella. ¡Está incompleta!</p>
+           <p>La varita solo funciona si dices el sonido inicial de la palabra <strong>VARITA</strong>.</p>
+           <p>¿Con qué letra empieza?</p>`,
+    speak: "Encuentras una varita. ¿Con qué letra empieza la palabra varita?",
+    challenge: {
+      type: "initial",
+      word: "VARITA",
+      correct: "V",
+      options: ["V", "B", "F", "P"],
+      success: "bosque"
+    }
+  },
+  camino: {
+    emoji: "✨",
+    text: `<p>¡Las sílabas se unen y el camino se ilumina! Avanzas hacia la cueva del dragón.</p>
+           <p>El dragón aparece… pero no es malo, solo está aburrido. Te propone un juego de rimas.</p>
+           <p>“Si encuentras la palabra que rima con <strong>DRAGÓN</strong>, te devolveré todas las sílabas.”</p>`,
+    speak: "El camino se abre. El dragón te reta a encontrar una rima con dragón.",
+    challenge: {
+      type: "rhyme",
+      main: "DRAGÓN",
+      options: ["CAJÓN", "MESA", "FLOR", "GATO"],
+      correct: "CAJÓN",
+      success: "final"
+    }
+  },
+  final: {
+    emoji: "🎉",
+    text: `<p>¡Lo lograste! El dragón sonríe y devuelve todas las sílabas al bosque.</p>
+           <p>Las letras bailan de alegría y el pueblo vuelve a ser mágico.</p>
+           <p><strong>¡Eres un verdadero héroe de las letras!</strong></p>
+           <p>Has aprendido sílabas, sonidos iniciales y rimas. ¡Felicidades!</p>`,
+    speak: "¡Lo lograste! El dragón devuelve las sílabas. ¡Eres un héroe de las letras!",
+    choices: [
+      { text: "🔄 Jugar otra vez", next: "start" }
+    ]
+  }
+};
+
+let currentNode = "start";
+let currentSpeak = "";
+
+function createStars() {
+  const c = document.getElementById('stars');
+  for (let i = 0; i < 60; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.width = s.style.height = (Math.random()*3+1)+'px';
+    s.style.left = Math.random()*100+'%';
+    s.style.top = Math.random()*100+'%';
+    s.style.animationDelay = Math.random()*3+'s';
+    c.appendChild(s);
+  }
+}
+
+function speak(text) {
+  if ('speechSynthesis' in window) {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'es-ES';
+    u.rate = 0.9;
+    u.pitch = 1.05;
+    speechSynthesis.speak(u);
+  }
+}
+
+function speakCurrent() {
+  if (currentSpeak) speak(currentSpeak);
+}
+
+function showNode(key) {
+  currentNode = key;
+  const node = story[key];
+  document.getElementById('sceneEmoji').textContent = node.emoji;
+  document.getElementById('storyText').innerHTML = node.text;
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('challengeArea').style.display = 'none';
+  document.getElementById('challengeArea').innerHTML = '';
+  document.getElementById('restartBtn').style.display = key === 'final' ? 'inline-block' : 'none';
+  
+  currentSpeak = node.speak || "";
+  speak(currentSpeak);
+  
+  const choicesDiv = document.getElementById('choices');
+  choicesDiv.innerHTML = '';
+  
+  if (node.choices) {
+    node.choices.forEach(c => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = c.text;
+      btn.onclick = () => showNode(c.next);
+      choicesDiv.appendChild(btn);
+    });
+  }
+  
+  if (node.challenge) {
+    renderChallenge(node.challenge);
+  }
+}
+
+function renderChallenge(ch) {
+  const area = document.getElementById('challengeArea');
+  area.style.display = 'block';
+  document.getElementById('choices').innerHTML = '';
+  
+  if (ch.type === 'syllables') {
+    area.innerHTML = `
+      <div class="phonics-challenge">
+        <p>Ordena las sílabas para formar <strong>${ch.word}</strong>:</p>
+        <div id="sylBtns" style="display:flex;justify-content:center;gap:12px;margin:15px 0;flex-wrap:wrap;"></div>
+        <div id="sylSlots" style="display:flex;justify-content:center;gap:10px;margin:15px 0;"></div>
+        <button class="btn" onclick="checkSyllables()">✅ Comprobar</button>
+      </div>`;
+    
+    const shuffled = [...ch.syllables].sort(() => Math.random()-0.5);
+    const btns = document.getElementById('sylBtns');
+    shuffled.forEach(s => {
+      const b = document.createElement('button');
+      b.className = 'choice-btn';
+      b.style.width = 'auto';
+      b.textContent = s;
+      b.onclick = () => {
+        const slots = document.getElementById('sylSlots');
+        if (slots.children.length < ch.syllables.length) {
+          const slot = document.createElement('div');
+          slot.textContent = s;
+          slot.style.cssText = 'background:#ffeaa7;color:#4a1a6b;padding:12px 18px;border-radius:12px;font-weight:800;font-size:1.3rem;';
+          slot.dataset.syl = s;
+          slots.appendChild(slot);
+          b.style.opacity = '0.4';
+          b.disabled = true;
+          speak(s.toLowerCase());
+        }
+      };
+      btns.appendChild(b);
+    });
+    
+    window.checkSyllables = () => {
+      const slots = [...document.getElementById('sylSlots').children].map(s => s.dataset.syl);
+      if (slots.join('') === ch.syllables.join('')) {
+        document.getElementById('feedback').textContent = '¡Correcto! 🌟';
+        document.getElementById('feedback').className = 'feedback ok';
+        speak("¡Excelente! La palabra es " + ch.word.toLowerCase());
+        setTimeout(() => showNode(ch.success), 1500);
+      } else {
+        document.getElementById('feedback').textContent = 'Casi... ¡Intenta otra vez!';
+        document.getElementById('feedback').className = 'feedback bad';
+        speak("Inténtalo de nuevo");
+        document.getElementById('sylSlots').innerHTML = '';
+        document.querySelectorAll('#sylBtns button').forEach(b => {
+          b.style.opacity = '1';
+          b.disabled = false;
+        });
+      }
+    };
+  }
+  
+  if (ch.type === 'initial') {
+    area.innerHTML = `
+      <div class="phonics-challenge">
+        <p>¿Con qué letra empieza <strong>${ch.word}</strong>?</p>
+        <div id="letterOpts" style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:15px 0;"></div>
+      </div>`;
+    const opts = document.getElementById('letterOpts');
+    ch.options.forEach(l => {
+      const b = document.createElement('button');
+      b.className = 'choice-btn';
+      b.style.width = '70px';
+      b.style.textAlign = 'center';
+      b.textContent = l;
+      b.onclick = () => {
+        if (l === ch.correct) {
+          document.getElementById('feedback').textContent = '¡Sí! Empieza con ' + l + ' 🌟';
+          document.getElementById('feedback').className = 'feedback ok';
+          speak("¡Correcto! Empieza con " + l.toLowerCase());
+          setTimeout(() => showNode(ch.success), 1400);
+        } else {
+          document.getElementById('feedback').textContent = 'No es esa... ¡Prueba otra!';
+          document.getElementById('feedback').className = 'feedback bad';
+          speak("Esa no es. Prueba otra letra");
+        }
+      };
+      opts.appendChild(b);
+    });
+  }
+  
+  if (ch.type === 'rhyme') {
+    area.innerHTML = `
+      <div class="phonics-challenge">
+        <p>¿Qué palabra rima con <strong>${ch.main}</strong>?</p>
+        <div id="rhymeOpts" style="display:flex;flex-direction:column;gap:10px;margin:15px 0;"></div>
+      </div>`;
+    const opts = document.getElementById('rhymeOpts');
+    ch.options.forEach(o => {
+      const b = document.createElement('button');
+      b.className = 'choice-btn';
+      b.textContent = o;
+      b.onclick = () => {
+        if (o === ch.correct) {
+          document.getElementById('feedback').textContent = '¡Riman perfecto! 🎉';
+          document.getElementById('feedback').className = 'feedback ok';
+          speak("¡Excelente! " + ch.main.toLowerCase() + " rima con " + o.toLowerCase());
+          setTimeout(() => showNode(ch.success), 1500);
+        } else {
+          document.getElementById('feedback').textContent = 'No riman... ¡Sigue buscando!';
+          document.getElementById('feedback').className = 'feedback bad';
+          speak("Esas no riman. Intenta otra");
+        }
+      };
+      opts.appendChild(b);
+    });
+  }
+}
+
+function restart() {
+  showNode('start');
+}
+
+createStars();
+showNode('start');
+</script>
+</body>
+</html>
